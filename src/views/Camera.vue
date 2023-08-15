@@ -130,7 +130,7 @@ const openFileExploreOrCamera = (key) => {
 
 const handleGetResult = () => {
     if (!fileValue) return;
-    const url = "http://35.208.18.220/uploads"
+    const url = "/api/uploads"
     const form = new FormData()
     form.append('image', fileValue.value)
     const startTime = new Date();
