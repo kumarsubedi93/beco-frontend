@@ -33,7 +33,7 @@
                     </v-menu>
                 </template>
             </div>
-            <input type="file" ref="fileInput" v-on:change="handleFileInput" class="hidden-file" />
+            <input type="file" accept="image/*" ref="fileInput" v-on:change="handleFileInput" class="hidden-file" />
             <h2 v-if="resultTxt" class="font-weight-bold"> The result is : <span style="color: green;"> {{ resultTxt.name }}
                 </span>
                 <br>
@@ -59,6 +59,7 @@
 
 <script setup>
 import Camera from "simple-vue-camera";
+import imageCompression from 'browser-image-compression';
 
 import { ref } from 'vue';
 import axios from 'axios';
@@ -101,7 +102,6 @@ const handleCameraLoading = () => {
 }
 
 const handleTakeSnapshoot = async () => {
-    console.log(cameraRef)
     const blob = await cameraRef.value?.snapshot(
         { width: 400, height: 400 },
         "image/png",
@@ -114,9 +114,9 @@ const handleTakeSnapshoot = async () => {
 }
 
 
-const handleFileInput = (e) => {
-    fileValue.value = e.target.files[0]
-    previewUrl.value = URL.createObjectURL(e.target.files[0])
+const handleFileInput = async (e) => {
+    const file = e.target.files[0]
+    await handleCompressImage(file)
 }
 
 const openFileExploreOrCamera = (key) => {
@@ -166,6 +166,19 @@ const mapJsonOutput = (result) => {
         return 1
     })
 }
+
+const handleCompressImage = async (file) => {
+    const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+    }
+    const compressedFile = await imageCompression(file, options);
+    const result = URL.createObjectURL(compressedFile);
+    previewUrl.value = result
+    fileValue.value = compressedFile
+}
+
 
 </script>
 
